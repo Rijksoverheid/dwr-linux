@@ -61,7 +61,7 @@ PWD=$(xsel -b);if [ "${#PWD}" != "32" ]; then >&2 echo "found length ${#PWD} on 
 ```
 
 ### Demo
-https://user-images.githubusercontent.com/4252918/120516282-76942900-c3cf-11eb-9fc1-a32bb8556cfd.mp4
+https://user-images.githubusercontent.com/4252918/120518527-f7542480-c3d1-11eb-8a2e-c50f17bd843f.mp4
 
 Please note: I could use 'Menu d' to go to Display settings, but sometimes this would shoot a 'd' to an open Outlook, deleting a message, so I replaced it with double Up.
 
