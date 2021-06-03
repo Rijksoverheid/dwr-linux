@@ -57,13 +57,20 @@ sudo apt install xsel
 ```
 Then this is my setup, my password comes from my KeePassXC password manager and is 32 chars long:
 ```bash
-PWD=$(xsel -b);if [ "${#PWD}" != "32" ]; then >&2 echo "found length ${#PWD} on clipboard: $PWD"; else xdotool search --onlyvisible --name "^DWR-Next-v1909 \(SSL/TLS Secured, 256 bit\)$" windowactivate %1 key --delay 1000 --window %1 'Ctrl+Alt+Delete' type "$PWD" && xdotool search --onlyvisible --name "^DWR-Next-v1909 \(SSL/TLS Secured, 256 bit\)$" key --delay 4000 --window %1 Return key --delay 1000 --window %1 Tab key --delay 500 --window %1 --clearmodifiers --repeat 3 "Super_L+d" key --delay 500 --window %1 --clearmodifiers Menu key --delay 100 --window %1 --repeat 2 Up key --delay 2000 --window %1 Return key --delay 100 --window %1 --repeat 2 Tab key --delay 100 --window %1 Return key --delay 100 --window %1 --repeat 4 Down key --delay 100 --window %1 Return key --delay 100 --window %1 "Alt+F4"; fi #DWRunlock-hdpi
+PW=$(xsel -b);if [ "${#PW}" != "32" ]; then >&2 echo "found length ${#PWD} on clipboard: $PWD"; else xdotool search --onlyvisible --name "^DWR-Next-v1909 \(SSL/TLS Secured, 256 bit\)$" windowactivate %1 key --delay 1000 --window %1 'Ctrl+Alt+Delete' type "$PW" && xdotool search --onlyvisible --name "^DWR-Next-v1909 \(SSL/TLS Secured, 256 bit\)$" key --delay 4000 --window %1 Return key --delay 1000 --window %1 Tab key --delay 500 --window %1 --clearmodifiers --repeat 3 "Super_L+d" key --delay 500 --window %1 --clearmodifiers Menu key --delay 100 --window %1 --repeat 2 Up key --delay 2000 --window %1 Return key --delay 100 --window %1 --repeat 2 Tab key --delay 100 --window %1 Return key --delay 100 --window %1 --repeat 4 Down key --delay 100 --window %1 Return key --delay 100 --window %1 "Alt+F4"; fi #DWRunlock-hdpi
 ```
 
-### Demo
-https://user-images.githubusercontent.com/4252918/120518527-f7542480-c3d1-11eb-8a2e-c50f17bd843f.mp4
+#### Demo
+https://user-images.githubusercontent.com/4252918/120599273-96ffca00-c447-11eb-8e75-02af28d8bc31.mp4
 
 Please note: I could use 'Menu d' to go to Display settings, but sometimes this would shoot a 'd' to an open Outlook, deleting a message, so I replaced it with double Up.
+
+### Filesystem Share Cleanup
+
+The Citrix Workspace App will create `.access^` and `.attribute^` files in the drives and folders you share. This is a cleanup command:
+```bash
+find -name '.access^' -size 0 -type f -delete && find -name '.attribute^' -type f -delete
+```
 
 ## WebEx
 
@@ -80,8 +87,8 @@ Please note that virtual inputs don't work unless there is echo canceling on it.
 
 Setup fake WebEx-proof mic:
 ```bash
-pactl load-module module-null-sink sink_name=VirtualSink sink_properties=device.description=VirtualSink && \
-pactl load-module module-null-sink sink_name=silence sink_properties=device.description="Silent_sink_for_echo_cancel" && \
+pactl load-module module-null-sink sink_name=VirtualSink sink_properties=device.description=VirtualSink
+pactl load-module module-null-sink sink_name=silence sink_properties=device.description="Silent_sink_for_echo_cancel"
 pactl load-module module-echo-cancel sink_name=virtual-microphone source_name=virtual-microphone source_master=VirtualSink.monitor sink_master=silence aec_method=null source_properties=device.description=Virtual-Microphone sink_properties=device.description=Virtual-Microphone
 ```
 Source [Unix Stack Exchange](https://unix.stackexchange.com/a/594698).
