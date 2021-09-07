@@ -79,10 +79,14 @@ There is a `.deb` and `.rpm`: [Download Webex](https://www.webex.com/downloads.h
 
 Debian/Ubuntu procedure:
 ```bash
-curl -OL 'https://binaries.webex.com/WebexDesktop-Ubuntu-Official-Package/Webex.deb'
-sudo apt install "$PWD/Webex.deb"
+curl -sSfLo '/tmp/webex.deb' 'https://binaries.webex.com/WebexDesktop-Ubuntu-Official-Package/Webex.deb'
+sudo apt install '/tmp/webex.deb'
 ```
 
+```bash
+# Update WebEx oneliner: check installed deb package, extract deb package version from metadata with range requests, if there is an update, download and install
+DEB_URL='https://binaries.webex.com/WebexDesktop-Ubuntu-Official-Package/Webex.deb';DEB_PKG='webex';dpkg --compare-versions $(dpkg-query -f '${Version}' -W "$DEB_PKG") lt $(curl -r "132-$(( $(curl -r "120-129" -sA '' "$DEB_URL") + 131 ))" -o - -sA '' "$DEB_URL" | tar -xzOf - './control' | grep -oP --color=never '^Version: \K.*$') && curl -sSfLo "/tmp/$DEB_PKG.deb" "$DEB_URL" && sudo apt install "/tmp/$DEB_PKG.deb"
+```
 Please note that virtual inputs don't work unless there is echo canceling on it.
 
 Setup fake WebEx-proof mic:
@@ -92,3 +96,24 @@ pactl load-module module-null-sink sink_name=silence sink_properties=device.desc
 pactl load-module module-echo-cancel sink_name=virtual-microphone source_name=virtual-microphone source_master=VirtualSink.monitor sink_master=silence aec_method=null source_properties=device.description=Virtual-Microphone sink_properties=device.description=Virtual-Microphone
 ```
 Source [Unix Stack Exchange](https://unix.stackexchange.com/a/594698).
+
+## Teams
+
+Some other government organizations (e.g. <abbr title="Vereniging van Nederlandse Gemeenten">VNG</abbr>) or external suppliers use Microsoft Teams.
+
+There is a `.deb` and `.rpm`: [Download Teams](https://www.microsoft.com/en-us/microsoft-teams/download-app)
+
+Debian/Ubuntu procedure:
+```bash
+curl -sSfLo '/tmp/teams.deb' 'https://go.microsoft.com/fwlink/p/?LinkID=2112886' # version 1.4.00.13653
+sudo apt install '/tmp/teams.deb'
+```
+
+```bash
+# Update Teams oneliner (using pup: https://github.com/EricChiang/pup#pup): check installed deb package, fetch the download page with Linux UA and follow the download url to get the deb url, extract deb package version from metadata with range requests, if there is an update, download and install
+DEB_URL="$(curl -sSfLIo /dev/null -w '%{url_effective}' $(curl --compressed -sSfA 'Mozilla/5.0 (X11; Linux x86_64)' https://www.microsoft.com/en-us/microsoft-teams/download-app | pup ':parent-of(:contains("Linux DEB")) attr{href}' | sed 's/&amp;/&/g'))";DEB_PKG="teams";dpkg --compare-versions $(dpkg-query -f '${Version}' -W "$DEB_PKG") lt $(curl -r "132-$(( $(curl -r "120-129" -sA '' "$DEB_URL") + 131 ))" -o - -sA '' "$DEB_URL" | tar -xzOf - './control' | grep -oP --color=never '^Version: \K.*$') && curl -sSfLo "/tmp/$DEB_PKG.deb" "$DEB_URL" && sudo apt install "/tmp/$DEB_PKG.deb"
+```
+
+Please note that Teams doesn't support all camera's, e.g. an [Elgato Cam Link 4K won't work](https://docs.microsoft.com/en-us/answers/questions/404273/black-screen-in-teams-using-elgato-cam-link-4k-in.html). There are [certified devices](https://www.microsoft.com/en-us/microsoft-teams/across-devices/devices?rtc=1) for Microsoft Teams, although unsure if this is valid for the Linux client and all devices are supported in Linux. Using [Open Broadcaster Software (OBS)](https://obsproject.com/) version 27 supports creating a Virtual Webcam and has full screen capture options via PipeWire on Wayland.
+
+As a backup you can use a browser, [but Firefox is not supported](https://support.microsoft.com/en-us/office/join-a-teams-meeting-on-an-unsupported-browser-daafdd3c-ac7a-4855-871b-9113bad15907) so you have to use a Chromium based browser.
